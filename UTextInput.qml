@@ -8,6 +8,7 @@ Item{
     property string dataType: 'text'
     property alias maximumLength: tiData.maximumLength
     property alias focusTextInput:tiData.focus
+    property alias customCursor: rectCursor
     property string label: 'Input: '
     property color fontColor: app.c2
     property int customHeight: -1
@@ -55,11 +56,32 @@ Item{
                 Keys.onReturnPressed: r.seted(text)
                 color: r.fontColor
                 validator: r.regularExp
+                cursorDelegate: rectCursor
             }
         }
     }
     RegExpValidator{
         id: regExpDataType
+    }
+    Component{
+        id: rectCursor
+        Rectangle {
+            color: app.c2
+            width: app.fs*0.25
+            Timer{
+                running: true
+                repeat: true
+                interval: 500
+                onTriggered: {
+                    if(tiData.focus){
+                        parent.visible=!parent.visible
+                    }else{
+                        parent.visible=false
+                    }
+
+                }
+            }
+        }
     }
     Component.onCompleted: {
         if(r.dataType!=='text'){

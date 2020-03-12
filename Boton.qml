@@ -64,7 +64,7 @@ Item {
             repeat: false
             interval: 1500
             onTriggered: {
-                    raiz.p = !raiz.p
+                    ma.pre = !ma.pre
             }
         }
     }

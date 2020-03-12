@@ -11,6 +11,7 @@ ApplicationWindow {
     property color c3: 'red'
     property color c4: 'gray'
     property int mod: -1
+    FontLoader{name: "FontAwesome"; source: "qrc:/fontawesome-webfont.ttf"}
 
     USettings{
         id: unikSettings
@@ -56,11 +57,14 @@ ApplicationWindow {
                     }
                 }
             }
-            Column{
+            Item{
+                id: xForms
                 width: parent.width
                 height: xApp.height-rowMenu.height
                 XFormInsert{
                     visible: app.mod===0
+                    tableName: 'productos'
+                    cols: ['cod', 'des', 'pco', 'pve', 'stock']
                 }
                 XFormSearch{
                     visible: app.mod===1
@@ -72,7 +76,7 @@ ApplicationWindow {
     }
     Component.onCompleted: {
         unik.debugLog=true
-        unik.sqliteInit('productos2.sqlite')
+        unik.sqliteInit('productos.sqlite')
         let sql='CREATE TABLE IF NOT EXISTS productos
                             (
                                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -87,6 +91,30 @@ ApplicationWindow {
     }
     Shortcut{
         sequence: 'Esc'
-        onActivated: Qt.quit()
+        onActivated: {
+            if(uLogView.visible){
+                uLogView.visible=false
+                return
+            }
+            if(uWarnings.visible){
+                uWarnings.visible=false
+                return
+            }
+            if(app.mod!==-1){
+                app.mod=-1
+                return
+            }
+            Qt.quit()
+        }
+    }
+    Shortcut{
+        sequence: 'Ctrl+Tab'
+        onActivated: {
+            if(app.mod<2){
+                app.mod++
+            }else{
+                app.mod=-1
+            }
+        }
     }
 }
