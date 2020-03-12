@@ -5,7 +5,7 @@ ApplicationWindow {
     id: app
     visible: true
     visibility: 'Maximized'
-    property int fs: app.width*0.02
+    property int fs: app.width*0.015
     property color c1: 'white'
     property color c2: 'black'
     property color c3: 'red'
