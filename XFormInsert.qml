@@ -46,8 +46,19 @@ Item {
                 label: 'Precio de Costo: '
                 width: app.fs*maximumLength
                 maximumLength: 19
-                regularExp: RegExpValidator{regExp: /^(^([1-9][0-9]{15})[\.]{1}[0-9]{2})|^(^([1-9][0-9]{0})[\.]{1}[0-9]{2})/ }
+                regularExp: RegExpValidator{regExp: /^\d+(\.\d{1,2})?$/ }
+                KeyNavigation.tab: tiPorcGan
+            }
+            UTextInput{
+                id: tiPorcGan
+                label: '% Ganancia: '
+                width: app.fs*maximumLength*2
+                maximumLength: 5
+                regularExp: RegExpValidator{regExp: /^([1-9])([0-9]{10})/ }
                 KeyNavigation.tab: tiPrecioVenta
+                onTextChanged: {
+                    tiPrecioVenta.text=calcPorcVen(parseFloat(tiPrecioCosto.text), parseFloat(tiPorcGan.text))
+                }
             }
             UTextInput{
                 id: tiPrecioVenta
@@ -115,13 +126,17 @@ Item {
         interval: 15000
         onTriggered: updateGui()
     }
+    function calcPorcVen(pcos, porc){
+        let diff=pcos/100*porc
+        return parseFloat(pcos+diff).toFixed(2)
+    }
     function getCount(){
         let sql = 'select '+r.cols[0]+' from '+r.tableName
         let rows = unik.getSqlData(sql)
         return rows.length
     }
     function insert(){
-        if(tiCodigo.text===''||tiDescripcion.text===''||tiPrecioCosto.text===''||tiPrecioVenta.text===''||tiStock.text===''){
+        if(tiCodigo.text===''||tiDescripcion.text===''||tiPrecioCosto.text===''||tiPrecioVenta.text===''||tiStock.text===''||tiPorcGan.text===''){
             uLogView.showLog('Error!\nNo se han introducido todos los datos requeridos.\nPara guardar este producto es necesario completar el formulario en su totalidad.')
             if(tiCodigo.text===''){
                 uLogView.showLog('Faltan los datos de código.')
@@ -137,6 +152,9 @@ Item {
             }
             if(tiStock.text===''){
                 uLogView.showLog('Faltan los datos de stock.')
+            }
+            if(tiPorcGan.text===''){
+                uLogView.showLog('Faltan los datos de porcentaje de ganancia.')
             }
             return
         }
@@ -167,7 +185,8 @@ Item {
                 '\''+tiDescripcion.text+'\','+
                 ''+pco+','+
                 ''+pve+','+
-                ''+tiStock.text+''+
+                ''+tiStock.text+','+
+                ''+tiPorcGan.text+''+
                 ')'
         let insertado = unik.sqlQuery(sql)
         if(insertado){

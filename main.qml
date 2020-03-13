@@ -84,7 +84,8 @@ ApplicationWindow {
                                 des TEXT NOT NULL,
                                 pco DECIMAL(14,2) NOT NULL,
                                 pve DECIMAL(14,2) NOT NULL,
-                                stock INTEGER NOT NULL
+                                stock INTEGER NOT NULL,
+                                gan INTEGER NOT NULL
                             )'
         let ejecutado = unik.sqlQuery(sql)
         console.log('Ejecutado: '+ejecutado)
