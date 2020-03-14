@@ -71,14 +71,15 @@ Item {
     }
     ListModel{
         id: lm
-        function addProd(pid, pcod, pdes, pcos, pven, pstock){
+        function addProd(pid, pcod, pdes, pcos, pven, pstock, pgan){
             return{
                 vpid: pid,
                 vpcod: pcod,
                 vpdes: pdes,
                 vpcos:pcos,
                 vpven: pven,
-                vpstock: pstock
+                vpstock: pstock,
+                vpgan: pgan
             }
         }
     }
@@ -96,7 +97,7 @@ Item {
                 id: txt
                 color:parseInt(vpid)!==-10?app.c2:app.c1
                 font.pixelSize: app.fs
-                text: parseInt(vpid)!==-10? '<b style="font-size:'+app.fs+'px;">Código: </b><span style="font-size:'+app.fs+'px;">'+vpcod+'</span><br /><br /><b  style="font-size:'+app.fs*1.4+'px;">Descripción:</b><span style="font-size:'+app.fs+'px;">'+vpdes+'</span><br /><br /><b style="font-size:'+app.fs+'px;">Precio de Costo:</b> <span style="font-size:'+app.fs+'px;">$'+vpcos+'</span><br><b style="font-size:'+app.fs+'px;">Precio de Venta:</b> <span style="font-size:'+app.fs+'px;">$'+vpven+'</span><br /><b>Cantidad en Stock:</b>'+vpstock :'<b>Resultados por código:</b> '+tiSearch.text
+                text: parseInt(vpid)!==-10? '<b style="font-size:'+app.fs+'px;">Código: </b><span style="font-size:'+app.fs+'px;">'+vpcod+'</span><br /><br /><b  style="font-size:'+app.fs*1.4+'px;">Descripción: </b><span style="font-size:'+app.fs+'px;">'+vpdes+'</span><br /><br /><b style="font-size:'+app.fs+'px;">Precio de Costo: </b> <span style="font-size:'+app.fs+'px;">$'+vpcos+'</span><br><b style="font-size:'+app.fs+'px;">Precio de Venta: </b> <span style="font-size:'+app.fs+'px;">$'+vpven+'</span><br /><b>Cantidad en Stock: </b>'+vpstock+'<br /><b>Ganancia: </b>'+vpgan:'<b>Resultados por código:</b> '+tiSearch.text
                 textFormat: Text.RichText
                 width: parent.width-app.fs
                 wrapMode: Text.WordWrap
@@ -117,7 +118,7 @@ Item {
                 id: txt
                 color:parseInt(vpid)!==-10?app.c2:app.c1
                 font.pixelSize: app.fs
-                text: parseInt(vpid)!==-10? '<b style="font-size:'+app.fs+'px;">Código: </b><span style="font-size:'+app.fs+'px;">'+vpcod+'</span><br /><br /><b  style="font-size:'+app.fs*1.4+'px;">Descripción:</b><span style="font-size:'+app.fs+'px;">'+vpdes+'</span><br /><br /><b style="font-size:'+app.fs+'px;">Precio de Costo:</b> <span style="font-size:'+app.fs+'px;">$'+vpcos+'</span><br><b style="font-size:'+app.fs+'px;">Precio de Venta:</b> <span style="font-size:'+app.fs+'px;">$'+vpven+'</span><br /><b>Cantidad en Stock:</b>'+vpstock :'<b>Resultados por descripción:</b> '+tiSearch.text
+                text: parseInt(vpid)!==-10? '<b style="font-size:'+app.fs+'px;">Código: </b><span style="font-size:'+app.fs+'px;">'+vpcod+'</span><br /><br /><b  style="font-size:'+app.fs*1.4+'px;">Descripción: </b><span style="font-size:'+app.fs+'px;">'+vpdes+'</span><br /><br /><b style="font-size:'+app.fs+'px;">Precio de Costo: </b> <span style="font-size:'+app.fs+'px;">$'+vpcos+'</span><br><b style="font-size:'+app.fs+'px;">Precio de Venta: </b> <span style="font-size:'+app.fs+'px;">$'+vpven+'</span><br /><b>Cantidad en Stock: </b>'+vpstock+'<br /><b>Ganancia: </b>'+vpgan:'<b>Resultados por descripción:</b> '+tiSearch.text
                 textFormat: Text.RichText
                 width: parent.width-app.fs
                 wrapMode: Text.WordWrap
@@ -156,7 +157,7 @@ Item {
         //console.log('Sql count result: '+rows.length)
         cant.text='Resultados: '+rows.length
         for(i=0;i<rows.length;i++){
-            lm.append(lm.addProd(rows[i].col[0], rows[i].col[1], rows[i].col[2], rows[i].col[3], rows[i].col[4], rows[i].col[5]))
+            lm.append(lm.addProd(rows[i].col[0], rows[i].col[1], rows[i].col[2], rows[i].col[3], rows[i].col[4], rows[i].col[5], rows[i].col[6]))
         }
 
         b=''
@@ -173,7 +174,7 @@ Item {
             //console.log('Sql count result: '+rows.length)
             //cant.text='Resultados: '+parseInt(rows.length+rows2.length)
             for(var i2=0;i2<rows2.length;i2++){
-                lm.append(lm.addProd(rows2[i2].col[0], rows2[i2].col[1], rows2[i2].col[2], rows2[i2].col[3], rows2[i2].col[4], rows[i].col[5]))
+                lm.append(lm.addProd(rows2[i2].col[0], rows2[i2].col[1], rows2[i2].col[2], rows2[i2].col[3], rows2[i2].col[4], rows[i].col[5], rows[i].col[6]))
             }
         }
     }

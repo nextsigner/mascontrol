@@ -64,7 +64,7 @@ ApplicationWindow {
                 XFormInsert{
                     visible: app.mod===0
                     tableName: 'productos'
-                    cols: ['cod', 'des', 'pco', 'pve', 'stock']
+                    cols: ['cod', 'des', 'pco', 'pve', 'stock', 'gan']
                 }
                 XFormSearch{
                     visible: app.mod===1
