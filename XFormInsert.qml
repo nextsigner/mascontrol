@@ -10,8 +10,15 @@ Item {
     property var cols: []
     onVisibleChanged: {
         if(visible){
-            tiCodigo.focus=true
             updateGui()
+            tiCodigo.focus=visible
+        }else{
+            tiCodigo.focus=false
+            tiDescripcion.focus=false
+            tiPrecioCosto.focus=false
+            tiPrecioVenta.focus=false
+            tiStock.focus=false
+            tiPorcGan.focus=false
         }
     }
     Column{
@@ -31,16 +38,25 @@ Item {
                 KeyNavigation.tab: tiDescripcion
                 property string uCodExist: ''
                 onTextChanged: {
-                    let ce=r.codExist()
-                    if(text!==r.uCodInserted&&ce&&text!==uCodExist){
-                        let msg='<b>Atención!: </b>El código actual ya existe.'
-                        unik.speak(msg.replace(/<[^>]*>?/gm, ''))
-                        labelStatus.text=msg
+                    tCheckCodExist.restart()
+                }
+                Timer{
+                    id: tCheckCodExist
+                    running: false
+                    repeat: false
+                    interval: 3000
+                    onTriggered: {
+                        let ce=r.codExist()
+                        if(tiCodigo.text!==r.uCodInserted&&ce&&tiCodigo.text!==tiCodigo.uCodExist){
+                            let msg='<b>Atención!: </b>El código actual ya existe.'
+                            unik.speak(msg.replace(/<[^>]*>?/gm, ''))
+                            labelStatus.text=msg
+                        }
+                        if(!ce){
+                            r.modificando=false
+                        }
+                        tiCodigo.uCodExist=tiCodigo.text
                     }
-                    if(!ce){
-                        r.modificando=false
-                    }
-                    uCodExist=text
                 }
             }
             UText{
@@ -68,6 +84,9 @@ Item {
                 maximumLength: 19
                 regularExp: RegExpValidator{regExp: /^\d+(\.\d{1,2})?$/ }
                 KeyNavigation.tab: tiPorcGan
+                onTextChanged: {
+                    tiPrecioVenta.text=calcPorcVen(parseFloat(tiPrecioCosto.text), parseFloat(tiPorcGan.text))
+                }
             }
             UTextInput{
                 id: tiPorcGan
@@ -87,6 +106,7 @@ Item {
                 maximumLength: 19
                 regularExp: RegExpValidator{regExp: /^\d+(\.\d{1,2})?$/ }
                 KeyNavigation.tab: tiStock
+                enabled: false
             }
             UTextInput{
                 id: tiStock
@@ -190,9 +210,15 @@ Item {
                 Row{
                     spacing: app.fs
                     BotonUX{
+                        id: botCodExistsMod
                         text: 'Modificar'
                         height: app.fs*1.6
-                        onClicked: {
+                        fontColor: focus?app.c1:app.c2
+                        bg.color: focus?app.c2:app.c1
+                        glow.radius:focus?2:6
+                        Keys.onReturnPressed: loadProd()
+                        onClicked: loadProd()
+                        function loadProd(){
                             xCodExists.visible=false
                             xCodExists.destroy(3000)
                             tiCodigo.text=vpcod
@@ -208,13 +234,16 @@ Item {
                     BotonUX{
                         text: 'Cerrar'
                         height: app.fs*1.6
+                        fontColor: focus?app.c1:app.c2
+                        bg.color: focus?app.c2:app.c1
+                        glow.radius:focus?2:6
                         onClicked: xCodExists.destroy(10)
                     }
                 }
             }
+            Component.onCompleted: botCodExistsMod.focus=true
         }
     }
-
     function codExist(){
         let sql = 'select * from '+r.tableName+' where cod=\''+tiCodigo.text+'\''
         let rows = unik.getSqlData(sql)
@@ -336,13 +365,13 @@ Item {
             pve+='.00'
         }
         let sql = 'update '+r.tableName+' set '+
-                'cod=\''+tiCodigo.text+'\','+
-                'des=\''+tiDescripcion.text+'\','+
-                'pco='+pco+','+
-                'pve='+pve+','+
-                'stock='+tiStock.text+','+
-                'gan='+tiPorcGan.text+''+
-                ' where id='+r.pIdAModificar
+            'cod=\''+tiCodigo.text+'\','+
+            'des=\''+tiDescripcion.text+'\','+
+            'pco='+pco+','+
+            'pve='+pve+','+
+            'stock='+tiStock.text+','+
+            'gan='+tiPorcGan.text+''+
+            ' where id='+r.pIdAModificar
         let insertado = unik.sqlQuery(sql)
         if(insertado){
             let msg='Se ha modificado el producto con el código '+tiCodigo.text
@@ -357,6 +386,6 @@ Item {
         //uLogView.showLog('Registro Insertado: '+insertado)
     }
     function updateGui(){
-        labelCount.text='Creando el registro número '+parseInt(getCount() + 1)
+        labelCount.text=!r.modificando?'Creando el registro número '+parseInt(getCount() + 1):'Modificando el registro con código '+tiCodigo.text
     }
 }

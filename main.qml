@@ -1,21 +1,44 @@
 import QtQuick 2.7
 import QtQuick.Controls 2.0
+import Qt.labs.settings 1.0
 
 ApplicationWindow {
     id: app
     visible: true
     visibility: 'Maximized'
+    color: app.c1
     property int fs: app.width*0.015
     property color c1: 'white'
     property color c2: 'black'
     property color c3: 'red'
     property color c4: 'gray'
-    property int mod: -1
+    property int mod: apps.cMod
     FontLoader{name: "FontAwesome"; source: "qrc:/fontawesome-webfont.ttf"}
+    onModChanged: apps.cMod=mod
+    Settings{
+        id: apps
+        property int cMod
+    }
 
     USettings{
         id: unikSettings
         url: './cfg'
+        onCurrentNumColorChanged: {
+            let mc=unikSettings.defaultColors.split('|')
+            let cc=mc[unikSettings.currentNumColor].split('-')
+            app.c1=cc[0]
+            app.c2=cc[1]
+            app.c3=cc[2]
+            app.c4=cc[3]
+        }
+        Component.onCompleted: {
+            let mc=unikSettings.defaultColors.split('|')
+            let cc=mc[unikSettings.currentNumColor].split('-')
+            app.c1=cc[0]
+            app.c2=cc[1]
+            app.c3=cc[2]
+            app.c4=cc[3]
+        }
     }
 
     Item{
@@ -24,50 +47,27 @@ ApplicationWindow {
         Column{
             anchors.fill: parent
             spacing: app.fs
-            Row{
-                id: rowMenu
-                spacing: app.fs*0.5
-                anchors.left: parent.left
-                anchors.leftMargin: app.fs*0.5
-                BotonUX{
-                    text: 'Inicio'
-                    height: app.fs*2
-                    onClicked: {
-                        app.mod=-1
-                    }
-                }
-                BotonUX{
-                    text: 'Insertar Registro'
-                    height: app.fs*2
-                    fontColor: app.mod===0?app.c1:app.c2
-                    bg.color: app.mod===0?app.c2:app.c1
-                    glow.radius:app.mod===0?2:6
-                    onClicked: {
-                        app.mod=0
-                    }
-                }
-                BotonUX{
-                    text: 'Buscar Registro'
-                    height: app.fs*2
-                    fontColor: app.mod===1?app.c1:app.c2
-                    bg.color: app.mod===1?app.c2:app.c1
-                    glow.radius:app.mod===1?2:6
-                    onClicked: {
-                        app.mod=1
-                    }
-                }
-            }
+            Item{width: 1;height: app.fs*0.25}
+            XMenu{id: xMenu}
             Item{
                 id: xForms
                 width: parent.width
-                height: xApp.height-rowMenu.height
+                height: xApp.height-xMenu.height-app.fs*2.25
+                XInicio{visible: app.mod===-1}
                 XFormInsert{
+                    id: xFormInsert
                     visible: app.mod===0
                     tableName: 'productos'
                     cols: ['cod', 'des', 'pco', 'pve', 'stock', 'gan']
                 }
                 XFormSearch{
+                    id: xFormSearch
                     visible: app.mod===1
+                    currentTableName: xFormInsert.tableName
+                }
+                XFormFact{
+                    id: xFormFact
+                    visible: app.mod===2
                 }
             }
         }
@@ -109,12 +109,26 @@ ApplicationWindow {
         }
     }
     Shortcut{
+        sequence: 'Ctrl+q'
+        onActivated: Qt.quit()
+    }
+    Shortcut{
         sequence: 'Ctrl+Tab'
         onActivated: {
             if(app.mod<2){
                 app.mod++
             }else{
                 app.mod=-1
+            }
+        }
+    }
+    Shortcut{
+        sequence: 'Ctrl+c'
+        onActivated: {
+            if(unikSettings.currentNumColor<16){
+                unikSettings.currentNumColor++
+            }else{
+                unikSettings.currentNumColor=0
             }
         }
     }
