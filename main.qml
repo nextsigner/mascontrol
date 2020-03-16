@@ -75,6 +75,9 @@ ApplicationWindow {
         UWarnings{id:uWarnings}
     }
     Component.onCompleted: {
+        if(!unik.folderExist('facts')){
+            unik.mkdir('facts')
+        }
         unik.debugLog=true
         unik.sqliteInit('productos.sqlite')
         let sql='CREATE TABLE IF NOT EXISTS productos

@@ -32,35 +32,6 @@ Item {
             Column{
                 id: colPdfPages
                 spacing: 5
-                Repeater{
-                    model: 8
-                    Rectangle{
-                        id: pdfPage
-                        width: 2480*0.5
-                        height:3508*0.5+1
-                        //color: '#ff8833'
-                        border.width: 1
-                        property int cabHeight: 0
-                        UText {
-                            text: 'PDF ejemplo '+parseInt(index+1)
-                            color: 'white'
-                            font.pixelSize: app.fs*3
-                            anchors.centerIn: parent
-                        }
-                        Component.onCompleted: {
-                            let comp=compCabFact
-                            let obj=comp.createObject(pdfPage, {})
-
-                            let compRCT=compRowCabTabla
-                            let objRCT=compRCT.createObject(pdfPage, {})
-                            objRCT.y=objRCT.parent.cabHeight+r.printMarginTop+r.hRows
-
-                            let compRPT=compRowPieTablaTotal
-                            let objRPT=compRPT.createObject(pdfPage, {})
-
-                        }
-                    }
-                }
             }
         }
     }
@@ -68,6 +39,44 @@ Item {
     property int fontSize: 16
     property int hRows: 30
     property var colsWidth: [0.08, 0.61, 0.08, 0.08,0.15]
+    Component{
+        id: compPdfPage
+        Rectangle{
+            id: pdfPage
+            width: 2480*0.5
+            height:3508*0.5+1
+            //color: '#ff8833'
+            border.width: 1
+            property int cabHeight: 0
+            property var prods: []
+            Component.onCompleted: {
+                let comp=compCabFact
+                let obj=comp.createObject(pdfPage, {})
+
+                let compRCT=compRowCabTabla
+                let objRCT=compRCT.createObject(pdfPage, {})
+                objRCT.y=objRCT.parent.cabHeight+r.printMarginTop+r.hRows
+
+                let yr=objRCT.height+objRCT.y
+                for(let i=0;i<prods.length;i++){
+                    //uLogView.showLog('cod: '+prods[0].cod)
+                    let compRT=compRowTabla
+                    let objProdRT={}
+                    objProdRT.y=yr
+                    objProdRT.cod=prods[i].cod
+                    objProdRT.des=prods[i].des
+                    objProdRT.cant=prods[i].cant
+                    objProdRT.prec=prods[i].prec
+
+                    let objRT=compRT.createObject(pdfPage, objProdRT)
+                    yr+=r.hRows
+                }
+
+                let compRPT=compRowPieTablaTotal
+                let objRPT=compRPT.createObject(pdfPage, {})
+            }
+        }
+    }
     Component{
         id: compCabFact
         Rectangle{
@@ -350,6 +359,93 @@ Item {
         }
     }
     Component{
+        id: compRowTabla
+        Item{
+            id: xRowTabla
+            width: parent.width*0.8
+            height: r.hRows
+            anchors.horizontalCenter: parent.horizontalCenter
+            property string cod: '000000'
+            property string des: 'abc'
+            property int cant: 0
+            property real prec: 0
+            Item{
+                width: parent.width
+                height: parent.height
+                clip: true
+                Row{
+                    Item{
+                        width: xRowTabla.width*r.colsWidth[0]
+                        height: r.hRows
+                        UText{
+                            text: xRowTabla.cod
+                            font.pixelSize: r.fontSize
+                            color: 'black'
+                            anchors.centerIn: parent
+                        }
+                    }
+                    Item{
+                        width: xRowTabla.width*r.colsWidth[1]
+                        height: r.hRows
+                        Item{
+                            width: parent.width+6
+                            height: parent.height
+                            x:-2
+                            UText{
+                                text: xRowTabla.des
+                                font.pixelSize: r.fontSize
+                                color: 'black'
+                                anchors.centerIn: parent
+                            }
+                        }
+                    }
+                    Item{
+                        width: xRowTabla.width*r.colsWidth[2]
+                        height: r.hRows
+                        UText{
+                            text: xRowTabla.cant
+                            font.pixelSize: r.fontSize
+                            color: 'black'
+                            anchors.centerIn: parent
+                        }
+                    }
+                    Item{
+                        width: xRowTabla.width*r.colsWidth[3]
+                        height: r.hRows
+                        Item{
+                            width: parent.width+6
+                            height: parent.height
+                            x:-2
+                            UText{
+                                text: xRowTabla.prec
+                                font.pixelSize: r.fontSize
+                                color: 'black'
+                                anchors.centerIn: parent
+                                horizontalAlignment: Text.AlignHCenter
+                            }
+                        }
+                    }
+                    Item{
+                        width: xRowTabla.width*r.colsWidth[4]
+                        height: r.hRows
+                        UText{
+                            text: '$'+parseFloat(xRowTabla.prec*xRowTabla.cant)
+                            font.pixelSize: r.fontSize
+                            color: 'black'
+                            anchors.centerIn: parent
+                        }
+                    }
+                }
+                Rectangle{
+                    width: xRowTabla.width
+                    height: 2
+                    color: 'black'
+                    anchors.bottom: parent.bottom
+                }
+            }
+        }
+    }
+    Component{
         id: compRowPieTablaTotal
         Rectangle{
             id: xRowPieTablaTotal
@@ -408,6 +504,16 @@ Item {
     BotonUX{
         text: 'Print'
         onClicked: {
+            //itemToImage(itemPDF)
+            setFactData()
+        }
+    }
+    Timer{
+        id: tPrint
+        running: false
+        repeat: false
+        interval: 1500
+        onTriggered: {
             itemToImage(itemPDF)
         }
     }
@@ -425,5 +531,21 @@ Item {
                 '</html>'
             wv.loadHtml(html)
         });
+    }
+    function setFactData(){
+        let cPdfPage=compPdfPage
+
+        let pds=[]
+        for(let i=0;i<45;i++){
+            let prod={}
+            prod.cod='cod-'+parseInt(i + 1)
+            prod.des='des-'+i
+            prod.cant=10
+            prod.prec=33
+            prod.descu=10
+            pds.push(prod)
+        }
+        let oPdfPage=cPdfPage.createObject(colPdfPages, {prods:pds})
+        tPrint.start()
     }
 }
