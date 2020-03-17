@@ -67,6 +67,7 @@ Item {
             property int cabHeight: 0
             property var prods: []
             Component.onCompleted: {
+                let totalFact=0.00
                 let comp=compCabFact
                 let obj=comp.createObject(pdfPage, {})
 
@@ -86,12 +87,21 @@ Item {
                     objProdRT.prec=prods[i].prec
                     objProdRT.dto=prods[i].dto
 
+                    let totalSinDto=parseFloat(prods[i].prec*prods[i].cant).toFixed(2)
+                    let vdto=totalSinDto / 100 * parseInt(prods[i].dto)
+                    let totalConDto=parseFloat(totalSinDto-vdto).toFixed(2)
+//                    totalFact=parseFloat(totalFact + totalConDto).toFixed(2)
+//                    uLogView.showLog('TF: '+totalSinDto)
+//                    uLogView.showLog('TF2: '+vdto)
+//                    uLogView.showLog('TF3: '+totalConDto)
+//                    uLogView.showLog('TF4: '+totalFact)
+
                     let objRT=compRT.createObject(pdfPage, objProdRT)
                     yr+=r.hRows
                 }
 
                 let compRPT=compRowPieTablaTotal
-                let objRPT=compRPT.createObject(pdfPage, {})
+                let objRPT=compRPT.createObject(pdfPage, {total: totalFact})
             }
         }
     }
@@ -484,7 +494,7 @@ Item {
                             anchors.centerIn: parent
                             Component.onCompleted: {
                                 let totalSinDto=parseFloat(xRowTabla.prec*xRowTabla.cant)
-                                let vdto=totalSinDto / 100 * parseInt(dto)
+                                let vdto=totalSinDto / 100 * parseInt(xRowTabla.dto)
                                 let totalConDto=parseFloat(totalSinDto-vdto).toFixed(2)
                                 text='$'+totalConDto
                             }
@@ -510,8 +520,8 @@ Item {
             anchors.bottom: parent.bottom
             anchors.bottomMargin: r.printMarginTop
             clip: true
-            property int total: 0
-            property int saldoAnterior: 0
+            property real total
+            property real saldoAnterior: 0.00
             Row{
                 Item{
                     width: xRowPieTablaTotal.width*(r.colsWidth[0]+r.colsWidth[1]+r.colsWidth[2]+r.colsWidth[3]+r.colsWidth[4])
