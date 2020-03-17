@@ -2,18 +2,49 @@ import QtQuick 2.0
 
 Item {
     id: r
-    anchors.fill: parent
+    width: parent.width-app.fs
     property bool buscando: false
     property string currentTableName: ''
+    property var prods: []
     onVisibleChanged: {
-         tiSearch.focus=visible
+        tiSearch.focus=visible
     }
+    Timer{
+        running: r.visible
+        repeat: true
+        interval: 500
+        onTriggered: {
+            prodCount.text=r.prods.length!==0?'Ya hay '+r.prods.length+' productos.':'Factura sin productos.'
+        }
+    }
+//    Rectangle{
+//        anchors.fill: r
+//        color: 'transparent'
+//        border.width: 1
+//        border.color: app.c2
+//    }
     Column{
         width: parent.width-app.fs
         height: parent.height
         spacing: app.fs*0.5
         anchors.horizontalCenter: parent.horizontalCenter
-        UText{text: 'Buscando en la planilla '+r.currentTableName; font.pixelSize: app.fs}
+        Row{
+            spacing: app.fs*3
+            UText{
+                id: prodCount;
+                text: r.prods.length!==0?'Ya hay '+r.prods.length+' productos.':'Factura sin productos.'; font.pixelSize: app.fs
+                anchors.verticalCenter: parent.verticalCenter
+            }
+            BotonUX{
+                text: 'Vista Previa'
+                onClicked: {
+                    r.parent.prods=r.prods
+                    r.parent.setFactData()
+                    r.parent.mod=1
+                }
+            }
+            //UText{text: 'Buscando en la planilla '+r.currentTableName; font.pixelSize: app.fs}
+        }
         Row{
             spacing: app.fs*0.5
             anchors.horizontalCenter: parent.horizontalCenter
@@ -73,7 +104,7 @@ Item {
         ListView{
             id: lv
             model: lm
-            delegate: rbCod.checked?delPorCod:delPorDes
+            delegate: del
             spacing: app.fs*0.5
             width: parent.width
             height: r.height-tiSearch.height-app.fs*2-cant.height
@@ -109,14 +140,16 @@ Item {
                 }
             }
             Component{
-                id: delPorCod
+                id: del
                 Rectangle{
+                    id: xProd
                     width: parent.width
                     height: txt.contentHeight+app.fs
                     radius: app.fs*0.1
                     border.width: 2
                     anchors.horizontalCenter: parent.horizontalCenter
                     color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
+                    property bool agregado: false
                     UText{
                         id: txt
                         color:parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c2:app.c1
@@ -127,59 +160,126 @@ Item {
                         wrapMode: Text.WordWrap
                         anchors.centerIn: parent
                     }
-                    BotonUX{
-                        text: 'Eliminar'
-                        height: app.fs*2
-                        fontColor: app.c2
-                        bg.color: app.c1
-                        glow.radius: 2
-                        visible: index===lv.currentIndex&&parseInt(vpid)!==-10
+                    Row{
+                        spacing: app.fs
+                        visible: index===lv.currentIndex&&parseInt(vpid)!==-10&&!xProd.agregado
                         anchors.right: parent.right
                         anchors.rightMargin: app.fs*0.5
                         anchors.top: parent.top
                         anchors.topMargin: app.fs*0.5
-                        onClicked: {
-                            let sql='delete from '+r.currentTableName+' where id='+vpid
-                            unik.sqlQuery(sql)
-                            search()
+                        onVisibleChanged: {
+                            tiCant.focus=visible
+                            if(visible){
+                                tiCant.textInput.selectAll()
+                            }
+                        }
+                        UTextInput{
+                            id:tiCant
+                            label: 'Cantidad: '
+                            text: '0'
+                            maximumLength:10
+                            width: app.fs*10
+                            fontColor:app.c1
+                            regularExp: RegExpValidator{regExp: /^([0-9])*$/}
+                            KeyNavigation.tab: tiDto
+                        }
+                        UTextInput{
+                            id:tiDto
+                            label: 'Descuento: %'
+                            text: '0'
+                            maximumLength:3
+                            width: app.fs*10
+                            fontColor:app.c1
+                            regularExp: RegExpValidator{regExp: /^([0-9])*$/}
+                            KeyNavigation.tab: botAgregarProd
+                        }
+                        BotonUX{
+                            id: botAgregarProd
+                            text: 'Agregar'
+                            height: app.fs*2
+                            fontColor: app.c2
+                            bg.color: app.c1
+                            glow.radius: 2
+                            KeyNavigation.tab: tiCant
+                            Keys.onReturnPressed: clicked()
+                            onClicked: {
+                                let msg=''
+                                if(parseInt(tiCant.text)<=0){
+                                    msg='Error en la cantidad. Definir una cantidad válida.'
+                                    unik.speak(msg)
+                                    return
+                                }
+                                let obj={}
+                                obj.cod=vpcod
+                                obj.des=vpdes
+                                obj.cos=vpcos
+                                obj.ven=vpven
+                                obj.gan=vpgan
+                                obj.cant=parseInt(tiCant.text)
+                                obj.dto=parseInt(tiDto.text)
+                                r.prods.push(obj)
+                                xProd.agregado=true
+                                msg=(parseInt(tiCant.text)===1?'Se ha':'Se han')+' agregado '+tiCant.text+' '+(parseInt(tiCant.text)===1?'producto':'productos')+' del código '+vpcod+' a la factura.'
+                                unik.speak(msg)
+                                //uLogView.showLog('Msg: '+msg)
+                                //uLogView.showLog('Cant Prods: '+r.prods.length)
+                            }
                         }
                     }
-                }
-            }
-            Component{
-                id: delPorDes
-                Rectangle{
-                    width: parent.width
-                    height: txt.contentHeight+app.fs
-                    radius: app.fs*0.1
-                    border.width: 2
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
-                    UText{
-                        id: txt
-                        color:parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c2:app.c1
-                        font.pixelSize: app.fs
-                        text: parseInt(vpid)!==-10? '<b style="font-size:'+app.fs+'px;">Código: </b><span style="font-size:'+app.fs+'px;">'+vpcod+'</span><br /><br /><b  style="font-size:'+app.fs*1.4+'px;">Descripción: </b><span style="font-size:'+app.fs+'px;">'+vpdes+'</span><br /><br /><b style="font-size:'+app.fs+'px;">Precio de Costo: </b> <span style="font-size:'+app.fs+'px;">$'+vpcos+'</span><br><b style="font-size:'+app.fs+'px;">Precio de Venta: </b> <span style="font-size:'+app.fs+'px;">$'+vpven+'</span><br /><b>Cantidad en Stock: </b>'+vpstock+'<br /><b>Ganancia: </b>'+vpgan:(tiSearch.text==='*'?'Mostrando todos los productos':'<b>Resultados por descripción:</b> '+tiSearch.text)
-                        textFormat: Text.RichText
-                        width: parent.width-app.fs
-                        wrapMode: Text.WordWrap
-                        anchors.centerIn: parent
-                    }
-                    BotonUX{
-                        text: 'Eliminar'
-                        height: app.fs*2
-                        fontColor: app.c2
-                        bg.color: app.c1
-                        glow.radius: 2
-                        visible: index===lv.currentIndex&&parseInt(vpid)!==-10
+                    Row{
+                        spacing: app.fs
+                        visible: index===lv.currentIndex&&parseInt(vpid)!==-10&&xProd.agregado
                         anchors.right: parent.right
                         anchors.rightMargin: app.fs*0.5
                         anchors.top: parent.top
                         anchors.topMargin: app.fs*0.5
-                        onClicked: {
-                            let sql='delete from '+r.currentTableName+' where id='+vpid
-                            unik.sqlQuery(sql)
-                            search()
+                        onVisibleChanged: {
+                            botQuitar.focus=visible
+                        }
+                        BotonUX{
+                            id: botQuitar
+                            text: 'Quitar de la Factura'
+                            height: app.fs*2
+                            fontColor: app.c2
+                            bg.color: app.c1
+                            glow.radius: 2
+                            Keys.onReturnPressed: clicked()
+                            onClicked: {
+                                let noProds=[]
+                                for(let i=0;i<r.prods.length;i++){
+                                    if(r.prods[i].cod!==vpcod){
+                                        noProds.push(r.prods[i])
+                                    }
+                                }
+                                r.prods=noProds
+                                xProd.agregado=false
+                                /*let msg=''
+                                if(parseInt(tiCant.text)<=0){
+                                    msg='Error en la cantidad. Definir una cantidad válida.'
+                                    unik.speak(msg)
+                                    return
+                                }
+                                let obj={}
+                                obj.cod=vpcod
+                                obj.des=vpdes
+                                obj.cos=vpcos
+                                obj.ven=vpven
+                                obj.gan=vpgan
+                                obj.cant=parseInt(tiCant.text)
+                                r.prods.push(obj)
+                                xProd.agregado=true
+                                msg=(parseInt(tiCant.text)===1?'Se ha':'Se han')+' agregado '+tiCant.text+' '+(parseInt(tiCant.text)===1?'producto':'productos')+' del código '+vpcod+' a la factura.'
+                                unik.speak(msg)*/
+                                //uLogView.showLog('Msg: '+msg)
+                                //uLogView.showLog('Cant Prods: '+r.prods.length)
+                            }
+                        }
+                    }
+                    Component.onCompleted: {
+                        for(let i=0;i<r.prods.length;i++){
+                            if(r.prods[i].cod===vpcod){
+                                xProd.agregado=true
+                            }
                         }
                     }
                 }

@@ -4,6 +4,7 @@ Item{
     id:r
     width: parent.width
     height: app.fs*2
+    property alias textInput:tiData
     property alias text:tiData.text
     property string dataType: 'text'
     property alias maximumLength: tiData.maximumLength
@@ -66,7 +67,7 @@ Item{
     Component{
         id: rectCursor
         Rectangle {
-            color: app.c2
+            color: r.fontColor
             width: app.fs*0.25
             Timer{
                 running: true

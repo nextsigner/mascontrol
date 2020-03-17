@@ -4,6 +4,14 @@ import QtWebEngine 1.5
 Item {
     id: r
     anchors.fill: parent
+    property int mod: 0
+    property var prods: []
+    XFormFactPrep{
+        id: xFormFactPrep
+        height: r.height
+        visible: r.mod===0
+        currentTableName: 'productos'
+    }
     WebEngineView{//Necesita args app --disable-web-security
         id: wv
         width: 2480*0.5
@@ -11,6 +19,7 @@ Item {
         settings.localContentCanAccessRemoteUrls: true
         settings.localStorageEnabled: true
         property string fn: ''
+        visible: r.mod===1
         onLoadProgressChanged:{
             if(loadProgress===100){
                 wv.printToPdf('facts/'+wv.fn+'.pdf', WebEngineView.A4, WebEngineView.Portrait)
@@ -25,6 +34,7 @@ Item {
         height: itemPDF.height
         contentWidth: itemPDF.width
         contentHeight: itemPDF.height*2
+        visible: r.mod===1
         Rectangle{
             id: itemPDF
             width: 2480*0.5
@@ -34,11 +44,18 @@ Item {
                 spacing: 5
             }
         }
+        BotonUX{
+            text: 'Print'
+            onClicked: {
+                //itemToImage(itemPDF)
+                setFactData()
+            }
+        }
     }
     property int printMarginTop: 60
     property int fontSize: 16
     property int hRows: 30
-    property var colsWidth: [0.08, 0.61, 0.08, 0.08,0.15]
+    property var colsWidth: [0.07, 0.52, 0.10, 0.10, 0.06,0.15]
     Component{
         id: compPdfPage
         Rectangle{
@@ -67,6 +84,7 @@ Item {
                     objProdRT.des=prods[i].des
                     objProdRT.cant=prods[i].cant
                     objProdRT.prec=prods[i].prec
+                    objProdRT.dto=prods[i].dto
 
                     let objRT=compRT.createObject(pdfPage, objProdRT)
                     yr+=r.hRows
@@ -301,8 +319,27 @@ Item {
                             }
                         }
                     }
-                    Rectangle{
+                    Item{
                         width: xRowCabTabla.width*r.colsWidth[4]
+                        height: r.hRows*1.5+10
+                        Rectangle{
+                            width: parent.width+6
+                            height: parent.height
+                            border.width: 2
+                            radius: 10
+                            x:-2
+                            UText{
+                                text: '% Dto.'
+                                font.pixelSize: r.fontSize
+                                color: 'black'
+                                anchors.centerIn: parent
+                                horizontalAlignment: Text.AlignHCenter
+                                anchors.verticalCenterOffset: -5
+                            }
+                        }
+                    }
+                    Rectangle{
+                        width: xRowCabTabla.width*r.colsWidth[5]
                         height: r.hRows*1.5+10
                         border.width: 2
                         radius: 10
@@ -324,14 +361,15 @@ Item {
             }
             Rectangle{
                 width: 2
-                height: xRowCabTabla.parent.height-xRowCabTabla.parent.cabHeight*2
+                height: xRowCabTabla.parent.height-xRowCabTabla.parent.cabHeight*2-parent.height
                 color: 'black'
+                anchors.top: parent.bottom
             }
             Row{
                 anchors.top: parent.bottom
                 anchors.horizontalCenter: parent.horizontalCenter
                 Repeater{
-                    model: 5
+                    model: 6
                     Item{
                         width: xRowCabTabla.width*r.colsWidth[index]
                         height: xRowCabTabla.parent.height-xRowCabTabla.parent.cabHeight*2-parent.parent.height
@@ -344,7 +382,7 @@ Item {
                                 if(index===1){
                                     anchors.rightMargin=-2
                                 }
-                                if(index===3){
+                                if(index===4){
                                     anchors.rightMargin=-2
                                 }
                             }
@@ -368,6 +406,7 @@ Item {
             property string cod: '000000'
             property string des: 'abc'
             property int cant: 0
+            property int dto: 0
             property real prec: 0
             Item{
                 width: parent.width
@@ -429,10 +468,26 @@ Item {
                         width: xRowTabla.width*r.colsWidth[4]
                         height: r.hRows
                         UText{
-                            text: '$'+parseFloat(xRowTabla.prec*xRowTabla.cant)
+                            text: '%'+xRowTabla.dto
                             font.pixelSize: r.fontSize
                             color: 'black'
                             anchors.centerIn: parent
+                        }
+                    }
+                    Item{
+                        width: xRowTabla.width*r.colsWidth[5]
+                        height: r.hRows
+                        UText{
+                            //text: '$'+parseFloat(xRowTabla.prec*xRowTabla.cant)
+                            font.pixelSize: r.fontSize
+                            color: 'black'
+                            anchors.centerIn: parent
+                            Component.onCompleted: {
+                                let totalSinDto=parseFloat(xRowTabla.prec*xRowTabla.cant)
+                                let vdto=totalSinDto / 100 * parseInt(dto)
+                                let totalConDto=parseFloat(totalSinDto-vdto).toFixed(2)
+                                text='$'+totalConDto
+                            }
                         }
                     }
                 }
@@ -459,7 +514,7 @@ Item {
             property int saldoAnterior: 0
             Row{
                 Item{
-                    width: xRowPieTablaTotal.width*(r.colsWidth[0]+r.colsWidth[1]+r.colsWidth[2]+r.colsWidth[3])
+                    width: xRowPieTablaTotal.width*(r.colsWidth[0]+r.colsWidth[1]+r.colsWidth[2]+r.colsWidth[3]+r.colsWidth[4])
                     height: r.hRows+10
                     Rectangle{
                         width: parent.width+2
@@ -479,7 +534,7 @@ Item {
                     }
                 }
                 Rectangle{
-                    width: xRowPieTablaTotal.width*r.colsWidth[4]
+                    width: xRowPieTablaTotal.width*r.colsWidth[5]
                     height: r.hRows+10
                     y:-10
                     border.width: 2
@@ -501,13 +556,7 @@ Item {
             }
         }
     }
-    BotonUX{
-        text: 'Print'
-        onClicked: {
-            //itemToImage(itemPDF)
-            setFactData()
-        }
-    }
+
     Timer{
         id: tPrint
         running: false
@@ -516,6 +565,22 @@ Item {
         onTriggered: {
             itemToImage(itemPDF)
         }
+    }
+    Component.onCompleted:{
+        /*let cPdfPage=compPdfPage
+
+        let pds=[]
+        for(let i=0;i<45;i++){
+            let prod={}
+            prod.cod='cod-'+parseInt(i + 1)
+            prod.des='des-'+i
+            prod.cant=10
+            prod.prec=33
+            prod.descu=10
+            pds.push(prod)
+        }
+        let oPdfPage=cPdfPage.createObject(colPdfPages, {prods:pds})
+        tPrint.start()*/
     }
     function itemToImage(item){
         let d = new Date(Date.now())
@@ -536,13 +601,13 @@ Item {
         let cPdfPage=compPdfPage
 
         let pds=[]
-        for(let i=0;i<45;i++){
+        for(let i=0;i<r.prods.length;i++){
             let prod={}
-            prod.cod='cod-'+parseInt(i + 1)
-            prod.des='des-'+i
-            prod.cant=10
-            prod.prec=33
-            prod.descu=10
+            prod.cod=r.prods[i].cod
+            prod.des=r.prods[i].des
+            prod.cant=r.prods[i].cant
+            prod.prec=r.prods[i].ven
+            prod.dto=r.prods[i].dto
             pds.push(prod)
         }
         let oPdfPage=cPdfPage.createObject(colPdfPages, {prods:pds})

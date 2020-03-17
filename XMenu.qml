@@ -35,4 +35,14 @@ Row{
             app.mod=1
         }
     }
+    BotonUX{
+        text: 'Crear Factura'
+        height: app.fs*2
+        fontColor: app.mod===2?app.c1:app.c2
+        bg.color: app.mod===2?app.c2:app.c1
+        glow.radius:app.mod===2?2:6
+        onClicked: {
+            app.mod=2
+        }
+    }
 }
