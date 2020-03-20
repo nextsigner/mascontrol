@@ -37,6 +37,9 @@ Item {
                 maximumLength: 10
                 KeyNavigation.tab: tiDescripcion
                 property string uCodExist: ''
+                onFocusChanged: {
+                    textInput.selectAll()
+                }
                 onTextChanged: {
                     tCheckCodExist.restart()
                 }
@@ -73,6 +76,9 @@ Item {
             width: r.width-app.fs
             maximumLength: 250
             KeyNavigation.tab: tiPrecioCosto
+            onFocusChanged: {
+                textInput.selectAll()
+            }
         }
         Row{
             spacing: app.fs
@@ -84,6 +90,9 @@ Item {
                 maximumLength: 19
                 regularExp: RegExpValidator{regExp: /^\d+(\.\d{1,2})?$/ }
                 KeyNavigation.tab: tiPorcGan
+                onFocusChanged: {
+                    textInput.selectAll()
+                }
                 onTextChanged: {
                     tiPrecioVenta.text=calcPorcVen(parseFloat(tiPrecioCosto.text), parseFloat(tiPorcGan.text))
                 }
@@ -95,6 +104,9 @@ Item {
                 maximumLength: 5
                 regularExp: RegExpValidator{regExp: /^([1-9])([0-9]{10})/ }
                 KeyNavigation.tab: tiPrecioVenta
+                onFocusChanged: {
+                    textInput.selectAll()
+                }
                 onTextChanged: {
                     tiPrecioVenta.text=calcPorcVen(parseFloat(tiPrecioCosto.text), parseFloat(tiPorcGan.text))
                 }

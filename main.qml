@@ -75,6 +75,7 @@ ApplicationWindow {
         UWarnings{id:uWarnings}
     }
     Component.onCompleted: {
+        //unik.createLink(unik.getPath(1),  '-folder=', unik.getPath(7)+'/control.lnk', 'Ejecutar +Control', pws+'/mascontrol');
         if(!unik.folderExist('facts')){
             unik.mkdir('facts')
         }
