@@ -79,7 +79,6 @@ Item {
                     URadioButton{
                         id: rbCod
                         text: 'Código'
-                        font.pixelSize: app.fs
                         checked: true
                         d: app.fs*1.4
                         onCheckedChanged: search()
@@ -87,7 +86,6 @@ Item {
                     URadioButton{
                         id: rbDes
                         text: 'Descripción'
-                        font.pixelSize: app.fs
                         d: app.fs*1.4
                         onCheckedChanged: search()
                     }

@@ -13,6 +13,12 @@ ApplicationWindow {
     property color c3: 'red'
     property color c4: 'gray'
     property int mod: apps.cMod
+
+
+    //Variables Globales
+    property var colsProds: ['cod', 'des', 'pco', 'pve', 'stock', 'gan']
+    property var colsNamesProds: ['Código', 'Descripción', 'Precio de Costo', 'Precio de Venta', 'Stock', 'Porcentaje de Ganancia']
+
     FontLoader{name: "FontAwesome"; source: "qrc:/fontawesome-webfont.ttf"}
     onModChanged: apps.cMod=mod
     Settings{
@@ -58,7 +64,7 @@ ApplicationWindow {
                     id: xFormInsert
                     visible: app.mod===0
                     tableName: 'productos'
-                    cols: ['cod', 'des', 'pco', 'pve', 'stock', 'gan']
+                    cols: app.colsProds
                 }
                 XFormSearch{
                     id: xFormSearch
