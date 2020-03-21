@@ -31,7 +31,12 @@ ApplicationWindow {
                 let dia=d.getDate()
                 let mes=d.getMonth()
                 let anio=(''+d.getYear()).split('')
-                let bdFN=unik.getPath(3)+'/productos_'+dia+'_'+mes+'_'+anio[anio.length-2]+anio[anio.length-1]+'.sqlite'
+
+                let hora=d.getHours()
+                let minuto=d.getMinutes()
+                let segundos=d.getSeconds()
+
+                let bdFN='productos_'+dia+'_'+mes+'_'+anio[anio.length-2]+anio[anio.length-1]+'_'+hora+'_'+minuto+'_'+segundos+'.sqlite'
 
                 bdFileName=bdFN
             }
@@ -98,7 +103,21 @@ ApplicationWindow {
             unik.mkdir('facts')
         }
         unik.debugLog=true
-        unik.sqliteInit(apps.bdFileName)
+
+        if(!unik.folderExist(pws+'/mascontrol')){
+            unik.mkdir(pws+'/mascontrol')
+        }
+        if(!unik.folderExist(pws+'/mascontrol/bds')){
+            unik.mkdir(pws+'/mascontrol/bds')
+        }
+        //apps.bdFileName=unik.currentFolderPath()+'/bds/p.sqlite'
+
+        let folderBds=""+pws+"/mascontrol/bds"
+        let bd=""+folderBds+"/"+apps.bdFileName
+        //uLogView.showLog('BDN: '+bd)
+        //apps.bdFileName=''
+        let iniciado=unik.sqliteInit(apps.bdFileName)
+        //uLogView.showLog('Iniciado: '+iniciado)
         let sql='CREATE TABLE IF NOT EXISTS productos
                             (
                                 id INTEGER PRIMARY KEY AUTOINCREMENT,
