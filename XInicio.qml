@@ -23,7 +23,7 @@ Item {
         }
         Item{width: 1;height: app.fs*3}
         UText{
-            text: '<b>Color actual: </b>'+unikSettings.currentNumColor
+            text: '<b>Base de Datos: </b>'+apps.bdFileName
             font.pixelSize: app.fs
         }
         UText{
@@ -31,6 +31,10 @@ Item {
            text: '<b>Cantidad de Productos: </b> Contando...'
             font.pixelSize: app.fs
         }
+        UText{
+            text: '<b>Color actual: </b>'+unikSettings.currentNumColor
+            font.pixelSize: app.fs
+        }        
     }
     Timer{
         running: r.visible

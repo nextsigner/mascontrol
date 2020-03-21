@@ -24,6 +24,18 @@ ApplicationWindow {
     Settings{
         id: apps
         property int cMod
+        property string bdFileName
+        Component.onCompleted: {
+            if(bdFileName===''){
+                let d=new Date(Date.now())
+                let dia=d.getDate()
+                let mes=d.getMonth()
+                let anio=(''+d.getYear()).split('')
+                let bdFN=unik.getPath(3)+'/productos_'+dia+'_'+mes+'_'+anio[anio.length-2]+anio[anio.length-1]+'.sqlite'
+
+                bdFileName=bdFN
+            }
+        }
     }
 
     USettings{
@@ -86,7 +98,7 @@ ApplicationWindow {
             unik.mkdir('facts')
         }
         unik.debugLog=true
-        unik.sqliteInit('productos.sqlite')
+        unik.sqliteInit(apps.bdFileName)
         let sql='CREATE TABLE IF NOT EXISTS productos
                             (
                                 id INTEGER PRIMARY KEY AUTOINCREMENT,
