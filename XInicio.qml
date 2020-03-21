@@ -1,4 +1,6 @@
 import QtQuick 2.0
+import Qt.labs.platform 1.1
+import Qt.labs.settings 1.0
 
 Item {
     id: r
@@ -8,6 +10,11 @@ Item {
             xApp.focus=visible
         }
     }
+    Settings{
+        id: inicioSettings
+        property string uFolder
+    }
+
     Column{
         anchors.centerIn: parent
         spacing: app.fs
@@ -33,30 +40,7 @@ Item {
         BotonUX{
             text: 'Hacer Copia de Seguridad'
             onClicked: {
-                let d=new Date(Date.now())
-                let dia=d.getDate()
-                let mes=d.getMonth()
-                let anio=(''+d.getYear()).split('')
-
-                let hora=d.getHours()
-                let minuto=d.getMinutes()
-                let segundos=d.getSeconds()
-
-                let bdFN='productos_'+dia+'_'+mes+'_'+anio[anio.length-2]+anio[anio.length-1]+'_'+hora+'_'+minuto+'_'+segundos+'.sqlite'
-
-                let folderBds=""+pws+"/mascontrol/bds"
-                let currentBd=""+folderBds+"/"+apps.bdFileName
-
-                let bd=""+folderBds+"/"+bdFN
-
-                //apps.bdFileName=bdFN
-
-                let cmd='cmd /c copy "'+currentBd+'" "'+bd+'"'
-                uLogView.showLog('CMD COPY: '+cmd)
-                unik.run(cmd)
-                //unik.setFile(bd, unik.getFile(apps.bdFileName))
-                //unik.sqliteClose()
-                //unik.sqliteInit(bd)
+                folderDialog.visible=true
             }
         }
         }
@@ -69,13 +53,41 @@ Item {
         UText{
             text: '<b>Color actual: </b>'+unikSettings.currentNumColor
             font.pixelSize: app.fs
-        }        
+        }
     }
     Timer{
         running: r.visible
         repeat: true
         interval: 1500
         onTriggered: actualizar()
+    }
+    FolderDialog {
+        id: folderDialog
+        currentFolder: inicioSettings.uFolder!==''?inicioSettings.uFolder:unik.getPath(3)
+        folder: StandardPaths.standardLocations(StandardPaths.Documents)[0]
+        onAccepted: {
+            inicioSettings.uFolder=folder
+            let d=new Date(Date.now())
+            let dia=d.getDate()
+            let mes=d.getMonth()
+            let anio=(''+d.getYear()).split('')
+
+            let hora=d.getHours()
+            let minuto=d.getMinutes()
+            let segundos=d.getSeconds()
+
+            let bdFN='productos_'+dia+'_'+mes+'_'+anio[anio.length-2]+anio[anio.length-1]+'_'+hora+'_'+minuto+'_'+segundos+'.sqlite'
+
+            let fs=(''+folder).replace('file:///', '')
+            let folderCurrentBds=""+pws+"/mascontrol/bds"
+            let folderBds=""+fs+""
+            let currentBd=(""+folderCurrentBds+"/"+apps.bdFileName).replace(/\//g, "\\\\")
+
+            let bd=(""+folderBds+"/"+bdFN).replace(/\//g, "\\\\")
+            let cmd='cmd /c copy "'+currentBd+'" "'+bd+'"'
+            //unik.run(cmd)
+            unik.ejecutarLineaDeComandoAparte(cmd)
+        }
     }
     function actualizar(){
         let sql = 'select * from productos'

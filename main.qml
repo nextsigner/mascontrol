@@ -114,10 +114,13 @@ ApplicationWindow {
 
         let folderBds=""+pws+"/mascontrol/bds"
         let bd=""+folderBds+"/"+apps.bdFileName
-        //uLogView.showLog('BDN: '+bd)
-        //apps.bdFileName=''
-        let iniciado=unik.sqliteInit(apps.bdFileName)
+        if(!unik.fileExist(bd)){
+            apps.bdFileName=getNewBdName()
+            bd=""+folderBds+"/"+apps.bdFileName
+        }
+        let iniciado=unik.sqliteInit(bd)
         //uLogView.showLog('Iniciado: '+iniciado)
+
         let sql='CREATE TABLE IF NOT EXISTS productos
                             (
                                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -172,5 +175,18 @@ ApplicationWindow {
                 unikSettings.currentNumColor=0
             }
         }
+    }
+    function getNewBdName(){
+        let d=new Date(Date.now())
+        let dia=d.getDate()
+        let mes=d.getMonth()
+        let anio=(''+d.getYear()).split('')
+
+        let hora=d.getHours()
+        let minuto=d.getMinutes()
+        let segundos=d.getSeconds()
+
+        let bdFN='productos_'+dia+'_'+mes+'_'+anio[anio.length-2]+anio[anio.length-1]+'_'+hora+'_'+minuto+'_'+segundos+'.sqlite'
+        return bdFN
     }
 }
