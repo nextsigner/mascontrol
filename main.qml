@@ -18,6 +18,8 @@ ApplicationWindow {
     //Variables Globales
     property var colsProds: ['cod', 'des', 'pco', 'pve', 'stock', 'gan']
     property var colsNamesProds: ['Código', 'Descripción', 'Precio de Costo', 'Precio de Venta', 'Stock', 'Porcentaje de Ganancia']
+    property var colsClis: ['cod', 'nom', 'dir', 'tel', 'email', 'saldo']
+
 
     FontLoader{name: "FontAwesome"; source: "qrc:/fontawesome-webfont.ttf"}
     onModChanged: apps.cMod=mod
@@ -83,6 +85,12 @@ ApplicationWindow {
                     tableName: 'productos'
                     cols: app.colsProds
                 }
+                XFormInsertCli{
+                    id: xFormInsertCli
+                    visible: app.mod===3
+                    tableName: 'clientes'
+                    cols: app.colsClis
+                }
                 XFormSearch{
                     id: xFormSearch
                     visible: app.mod===1
@@ -122,7 +130,7 @@ ApplicationWindow {
     Shortcut{
         sequence: 'Ctrl+Tab'
         onActivated: {
-            if(app.mod<2){
+            if(app.mod<3){
                 app.mod++
             }else{
                 app.mod=-1
@@ -181,7 +189,8 @@ ApplicationWindow {
                                 nom TEXT NOT NULL,
                                 dir TEXT NOT NULL,
                                 tel TEXT NOT NULL,
-                                email TEXT NOT NULL
+                                email TEXT NOT NULL,
+                                saldo DECIMAL(14,2) NOT NULL
                             )'
         unik.sqlQuery(sql)
         //console.log('Ejecutado: '+ejecutado)

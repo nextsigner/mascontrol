@@ -45,4 +45,14 @@ Row{
             app.mod=2
         }
     }
+    BotonUX{
+        text: 'Insertar Clientes'
+        height: app.fs*2
+        fontColor: app.mod===3?app.c1:app.c2
+        bg.color: app.mod===3?app.c2:app.c1
+        glow.radius:app.mod===3?2:6
+        onClicked: {
+            app.mod=3
+        }
+    }
 }
