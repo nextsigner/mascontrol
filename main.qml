@@ -97,43 +97,6 @@ ApplicationWindow {
         ULogView{id:uLogView}
         UWarnings{id:uWarnings}
     }
-    Component.onCompleted: {
-        //unik.createLink(unik.getPath(1),  '-folder=', unik.getPath(7)+'/control.lnk', 'Ejecutar +Control', pws+'/mascontrol');
-        if(!unik.folderExist('facts')){
-            unik.mkdir('facts')
-        }
-        unik.debugLog=true
-
-        if(!unik.folderExist(pws+'/mascontrol')){
-            unik.mkdir(pws+'/mascontrol')
-        }
-        if(!unik.folderExist(pws+'/mascontrol/bds')){
-            unik.mkdir(pws+'/mascontrol/bds')
-        }
-        //apps.bdFileName=unik.currentFolderPath()+'/bds/p.sqlite'
-
-        let folderBds=""+pws+"/mascontrol/bds"
-        let bd=""+folderBds+"/"+apps.bdFileName
-        if(!unik.fileExist(bd)){
-            apps.bdFileName=getNewBdName()
-            bd=""+folderBds+"/"+apps.bdFileName
-        }
-        let iniciado=unik.sqliteInit(bd)
-        //uLogView.showLog('Iniciado: '+iniciado)
-
-        let sql='CREATE TABLE IF NOT EXISTS productos
-                            (
-                                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                                cod TEXT NOT NULL,
-                                des TEXT NOT NULL,
-                                pco DECIMAL(14,2) NOT NULL,
-                                pve DECIMAL(14,2) NOT NULL,
-                                stock INTEGER NOT NULL,
-                                gan INTEGER NOT NULL
-                            )'
-        let ejecutado = unik.sqlQuery(sql)
-        console.log('Ejecutado: '+ejecutado)
-    }
     Shortcut{
         sequence: 'Esc'
         onActivated: {
@@ -175,6 +138,43 @@ ApplicationWindow {
                 unikSettings.currentNumColor=0
             }
         }
+    }
+    Component.onCompleted: {
+        //unik.createLink(unik.getPath(1),  '-folder=', unik.getPath(7)+'/control.lnk', 'Ejecutar +Control', pws+'/mascontrol');
+        if(!unik.folderExist('facts')){
+            unik.mkdir('facts')
+        }
+        unik.debugLog=true
+
+        if(!unik.folderExist(pws+'/mascontrol')){
+            unik.mkdir(pws+'/mascontrol')
+        }
+        if(!unik.folderExist(pws+'/mascontrol/bds')){
+            unik.mkdir(pws+'/mascontrol/bds')
+        }
+        //apps.bdFileName=unik.currentFolderPath()+'/bds/p.sqlite'
+
+        let folderBds=""+pws+"/mascontrol/bds"
+        let bd=""+folderBds+"/"+apps.bdFileName
+        if(!unik.fileExist(bd)){
+            apps.bdFileName=getNewBdName()
+            bd=""+folderBds+"/"+apps.bdFileName
+        }
+        let iniciado=unik.sqliteInit(bd)
+        //uLogView.showLog('Iniciado: '+iniciado)
+
+        let sql='CREATE TABLE IF NOT EXISTS productos
+                            (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                cod TEXT NOT NULL,
+                                des TEXT NOT NULL,
+                                pco DECIMAL(14,2) NOT NULL,
+                                pve DECIMAL(14,2) NOT NULL,
+                                stock INTEGER NOT NULL,
+                                gan INTEGER NOT NULL
+                            )'
+        let ejecutado = unik.sqlQuery(sql)
+        console.log('Ejecutado: '+ejecutado)
     }
     function getNewBdName(){
         let d=new Date(Date.now())
