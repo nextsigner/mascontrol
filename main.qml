@@ -155,7 +155,7 @@ ApplicationWindow {
         //apps.bdFileName=unik.currentFolderPath()+'/bds/p.sqlite'
 
         let folderBds=""+pws+"/mascontrol/bds"
-        let bd=""+folderBds+"/"+apps.bdFileName
+        let bd=apps.bdFileName.indexOf('\\')<0?""+folderBds+"/"+apps.bdFileName:""+apps.bdFileName.replace(/\\\\/g, '/')
         if(!unik.fileExist(bd)){
             apps.bdFileName=getNewBdName()
             bd=""+folderBds+"/"+apps.bdFileName
@@ -173,8 +173,18 @@ ApplicationWindow {
                                 stock INTEGER NOT NULL,
                                 gan INTEGER NOT NULL
                             )'
-        let ejecutado = unik.sqlQuery(sql)
-        console.log('Ejecutado: '+ejecutado)
+        unik.sqlQuery(sql)
+        sql='CREATE TABLE IF NOT EXISTS clientes
+                            (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                cod TEXT NOT NULL,
+                                nom TEXT NOT NULL,
+                                dir TEXT NOT NULL,
+                                tel TEXT NOT NULL,
+                                email TEXT NOT NULL
+                            )'
+        unik.sqlQuery(sql)
+        //console.log('Ejecutado: '+ejecutado)
     }
     function getNewBdName(){
         let d=new Date(Date.now())

@@ -91,13 +91,14 @@ Item {
         acceptLabel: 'Seleccionar Base de Datos'
         property int mod:0
         onAccepted: {
+            var bdSelected=""
             if(mod===0){
                 unik.sqliteClose()
                 let fn0=(''+file).replace('file:///', '').split('/')
                 let fn1=fn0[fn0.length-1]
                 //uLogView.showLog('Sqlite: '+fn1)
                 let fs=(''+files).replace('file:///', '')
-                let bdSelected=(""+fs).replace(/\//g, "\\\\")
+                bdSelected=(""+fs).replace(/\//g, "\\\\")
                 unik.sqliteInit(bdSelected)
                 let sql='SELECT count(*) FROM sqlite_master WHERE type = \'table\' AND name != \'sqlite_sequence\';'
                 let rows=unik.sqlQuery(sql)
@@ -105,6 +106,7 @@ Item {
                     unik.speak('Error. No se ha podido conectar a la base de datos que se intenta abrir.')
                 }else{
                     unik.speak('Archivo abierto. Base de datos conextada con éxito.')
+                    apps.bdFileName=bdSelected
                 }
 
             }
@@ -121,7 +123,7 @@ Item {
                     let folderBds=""+folder+""
                     let nBd=(""+folderCurrentBds+"/"+fn1).replace(/\//g, "\\\\")
 
-                    let bdSelected=(""+fs).replace(/\//g, "\\\\")
+                    bdSelected=(""+fs).replace(/\//g, "\\\\")
                     let cmd='cmd /c copy "'+bdSelected+'" "'+nBd+'"'
                     unik.sqliteClose()
                     xMsgCopiando.mod=2
@@ -156,7 +158,7 @@ Item {
             let fs=(''+folder).replace('file:///', '')
             let folderCurrentBds=""+pws+"/mascontrol/bds"
             let folderBds=""+fs+""
-            let currentBd=(""+folderCurrentBds+"/"+apps.bdFileName).replace(/\//g, "\\\\")
+            let currentBd=apps.bdFileName.indexOf('\\')<0?(""+folderCurrentBds+"/"+apps.bdFileName).replace(/\//g, "\\\\"):""+apps.bdFileName
 
             let bd=(""+folderBds+"/"+bdFN).replace(/\//g, "\\\\")
             let cmd='cmd /c copy "'+currentBd+'" "'+bd+'"'
