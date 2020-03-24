@@ -7,6 +7,7 @@ ApplicationWindow {
     visible: true
     visibility: 'Maximized'
     color: app.c1
+    property var objFocus
     property int fs: app.width*0.015
     property color c1: 'white'
     property color c2: 'black'
@@ -160,6 +161,7 @@ ApplicationWindow {
         if(!unik.folderExist(pws+'/mascontrol/bds')){
             unik.mkdir(pws+'/mascontrol/bds')
         }
+        //apps.bdFileName=''
         //apps.bdFileName=unik.currentFolderPath()+'/bds/p.sqlite'
 
         let folderBds=""+pws+"/mascontrol/bds"
@@ -168,6 +170,8 @@ ApplicationWindow {
             apps.bdFileName=getNewBdName()
             bd=""+folderBds+"/"+apps.bdFileName
         }
+        //bd="C:\\Users\\qt\\Documents\\unik\\mascontrol\\bds\\productos_24_2_20_17_4_1.sqlite"
+        //uLogView.showLog('Iniciando Bd: '+bd)
         let iniciado=unik.sqliteInit(bd)
         //uLogView.showLog('Iniciado: '+iniciado)
 

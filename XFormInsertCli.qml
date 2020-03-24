@@ -23,13 +23,13 @@ Item {
             tiSaldo.focus=false
         }
     }
-    Column{
+    Row{
         spacing: app.fs
         anchors.fill: r
         Column{
             id: colInsCli
-            width: r.width-app.fs
-            anchors.horizontalCenter: parent.horizontalCenter
+            width: r.width*0.5-app.fs
+            //anchors.horizontalCenter: parent.horizontalCenter
             spacing: app.fs*0.5
             UText{
                 text:  !r.modificando?'<b>Insertando Cliente</b>':'<b>Modificando Cliente</b>'
@@ -71,7 +71,7 @@ Item {
                 }
                 UText{
                     id: labelCount
-                    width: r.width-tiCodigo.width-app.fs*2
+                    width: colInsCli.width-tiCodigo.width-app.fs*2
                     height: contentHeight
                     wrapMode: Text.WordWrap
                     anchors.verticalCenter: parent.verticalCenter
@@ -80,7 +80,7 @@ Item {
             UTextInput{
                 id: tiNombre
                 label: 'Nombre: '
-                width: r.width-app.fs
+                width: colInsCli.width-app.fs
                 maximumLength: 250
                 KeyNavigation.tab: tiDir
                 onFocusChanged: {
@@ -90,7 +90,7 @@ Item {
             UTextInput{
                 id: tiDir
                 label: 'Dirección: '
-                width: r.width-app.fs
+                width: colInsCli.width-app.fs
                 maximumLength: 250
                 KeyNavigation.tab: tiTel
                 onFocusChanged: {
@@ -100,7 +100,7 @@ Item {
             UTextInput{
                 id: tiTel
                 label: 'Teléfono: '
-                width: r.width-app.fs
+                width: colInsCli.width-app.fs
                 maximumLength: 250
                 KeyNavigation.tab: tiCorreo
                 onFocusChanged: {
@@ -110,7 +110,7 @@ Item {
             UTextInput{
                 id: tiCorreo
                 label: 'E-Mail: '
-                width: r.width-app.fs
+                width: colInsCli.width-app.fs
                 maximumLength: 250
                 KeyNavigation.tab: tiSaldo
                 onFocusChanged: {
@@ -168,6 +168,7 @@ Item {
                         }else{
                             modify()
                         }
+                        search()
                     }
                     KeyNavigation.tab: lv
                     Keys.onReturnPressed: {
@@ -176,129 +177,144 @@ Item {
                         }else{
                             modify()
                         }
+                        search()
+                    }
+                    UnikFocus{
+                        visible: parent.focus
                     }
                 }
             }
         }
-        ListView{
-            id: lv
-            model: lm
-            delegate: delPorCod//rbCod.checked?delPorCod:delPorDes
-            spacing: app.fs*0.5
-            width: parent.width
-            height: r.height-colInsCli.height-app.fs*2
-            clip: true
-            onFocusChanged: currentIndex=1
-            KeyNavigation.tab: tiCodigo
-            Keys.onDownPressed: {
-                if(currentIndex<lm.count-1){
-                    currentIndex++
-                }else{
-                    currentIndex=1
-                }
+        Rectangle{
+            width: parent.width*0.5
+            height: parent.height
+            color: 'transparent'
+            border.color: app.c2
+            border.width:   2
+            UnikFocus{
+                visible: lv.focus
+                //c:'red'
+                //border.color: 'blue'
             }
-            Keys.onUpPressed: {
-                if(currentIndex>1){
-                    currentIndex--
-                }else{
-                    currentIndex=lm.count-1
-                }
-            }
-            ListModel{
-                id: lm
-                function addProd(pid, pcod, pnom, pdir, ptel, pemail, psaldo){
-                    return{
-                        vpid: pid,
-                        vpcod: pcod,
-                        vpnom: pnom,
-                        vpdir:pdir,
-                        vptel: ptel,
-                        vpemail: pemail,
-                        vpsaldo: psaldo
+            ListView{
+                id: lv
+                model: lm
+                delegate: delPorCod//rbCod.checked?delPorCod:delPorDes
+                spacing: app.fs*0.5
+                width: parent.width
+                height: parent.height
+                clip: true
+                onFocusChanged: currentIndex=1
+                KeyNavigation.tab: tiCodigo
+                Keys.onDownPressed: {
+                    if(currentIndex<lm.count-1){
+                        currentIndex++
+                    }else{
+                        currentIndex=1
                     }
                 }
-            }
-            Component{
-                id: delPorCod
-                Rectangle{
-                    id:xRowDes
-                    width: parent.width
-                    height: parseInt(vpid)!==-10?txtNom.height+app.fs:app.fs*3
-                    radius: app.fs*0.1
-                    border.width: 2
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
-                    property string fontColor: index!==lv.currentIndex?app.c2:app.c1
-                    MouseArea{
-                        anchors.fill: parent
-                        onClicked: lv.currentIndex=index
+                Keys.onUpPressed: {
+                    if(currentIndex>1){
+                        currentIndex--
+                    }else{
+                        currentIndex=lm.count-1
                     }
-                    Row{
-                        visible: parseInt(vpid)!==-10
-                        anchors.centerIn: parent
-                        Rectangle{
-                            id: xRD1
-                            width: app.fs*10
-                            height:xRD2.height
-                            border.width: 2
-                            border.color: app.c2
-                            color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
-                            UText{
-                                text: vpcod
-                                anchors.centerIn: parent
-                                color: xRowDes.fontColor
-                            }
-                        }
-                        Rectangle{
-                            id: xRD2
-                            width: xRowDes.width-xRD1.width-xRD3.width
-                            height:txtNom.contentHeight+app.fs*2
-                            border.width: 2
-                            border.color: app.c2
-                            color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
-                            UText{
-                                id: txtNom
-                                text: vpnom
-                                color: xRowDes.fontColor
-                                width: parent.width-app.fs
-                                wrapMode: Text.WordWrap
-                                anchors.centerIn: parent
-                            }
-                        }
-                        Rectangle{
-                            id: xRD3
-                            width: app.fs*10
-                            height:xRD2.height
-                            border.width: 2
-                            border.color: app.c2
-                            color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
-                            UText{
-                                text: vpsaldo
-                                color: xRowDes.fontColor
-                                anchors.centerIn: parent
-                            }
+                }
+                ListModel{
+                    id: lm
+                    function addProd(pid, pcod, pnom, pdir, ptel, pemail, psaldo){
+                        return{
+                            vpid: pid,
+                            vpcod: pcod,
+                            vpnom: pnom,
+                            vpdir:pdir,
+                            vptel: ptel,
+                            vpemail: pemail,
+                            vpsaldo: psaldo
                         }
                     }
-                    BotonUX{
-                        text: 'Eliminar'
-                        height: app.fs*2
-                        fontColor: app.c2
-                        bg.color: app.c1
-                        glow.radius: 2
-                        visible: index===lv.currentIndex&&parseInt(vpid)!==-10
-                        anchors.right: parent.right
-                        anchors.rightMargin: app.fs*0.5
-                        anchors.verticalCenter: parent.verticalCenter
-                        onClicked: {
-                            let sql='delete from '+r.currentTableName+' where id='+vpid
-                            unik.sqlQuery(sql)
-                            search()
+                }
+                Component{
+                    id: delPorCod
+                    Rectangle{
+                        id:xRowDes
+                        width: parent.width
+                        height: parseInt(vpid)!==-10?txtNom.height+app.fs:app.fs*3
+                        radius: app.fs*0.1
+                        border.width: 2
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
+                        property string fontColor: index!==lv.currentIndex?app.c2:app.c1
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: lv.currentIndex=index
+                        }
+                        Row{
+                            visible: parseInt(vpid)!==-10
+                            anchors.centerIn: parent
+                            Rectangle{
+                                id: xRD1
+                                width: app.fs*10
+                                height:xRD2.height
+                                border.width: 2
+                                border.color: app.c2
+                                color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
+                                UText{
+                                    text: vpcod
+                                    anchors.centerIn: parent
+                                    color: xRowDes.fontColor
+                                }
+                            }
+                            Rectangle{
+                                id: xRD2
+                                width: xRowDes.width-xRD1.width-xRD3.width
+                                height:txtNom.contentHeight+app.fs*2
+                                border.width: 2
+                                border.color: app.c2
+                                color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
+                                UText{
+                                    id: txtNom
+                                    text: vpnom
+                                    color: xRowDes.fontColor
+                                    width: parent.width-app.fs
+                                    wrapMode: Text.WordWrap
+                                    anchors.centerIn: parent
+                                }
+                            }
+                            Rectangle{
+                                id: xRD3
+                                width: app.fs*10
+                                height:xRD2.height
+                                border.width: 2
+                                border.color: app.c2
+                                color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
+                                UText{
+                                    text: vpsaldo
+                                    color: xRowDes.fontColor
+                                    anchors.centerIn: parent
+                                }
+                            }
+                        }
+                        BotonUX{
+                            text: 'Eliminar'
+                            height: app.fs*2
+                            fontColor: app.c2
+                            bg.color: app.c1
+                            glow.radius: 2
+                            visible: index===lv.currentIndex&&parseInt(vpid)!==-10
+                            anchors.right: parent.right
+                            anchors.rightMargin: app.fs*0.5
+                            anchors.verticalCenter: parent.verticalCenter
+                            onClicked: {
+                                let sql='delete from '+r.currentTableName+' where id='+vpid
+                                unik.sqlQuery(sql)
+                                search()
+                            }
                         }
                     }
                 }
             }
         }
-
     }
     Timer{
         repeat: true
@@ -513,7 +529,7 @@ Item {
         //if(!buscando)return
         lm.clear()
         lm.append(lm.addProd('-10', 'Lista de Clientes', '', '','','',''))
-        var sql='select * from clientes'
+        var sql='select * from clientes order by id desc'
         var rows=unik.getSqlData(sql)
         //console.log('Sql count result: '+rows.length)
         //cant.text='Resultados: '+rows.length
