@@ -126,7 +126,7 @@ Item {
                 width: app.fs*maximumLength
                 maximumLength: 10
                 regularExp: RegExpValidator{regExp: /^\d+(\.\d{1,2})?$/ }
-                KeyNavigation.tab: botReg
+                KeyNavigation.tab: botClear
             }
         }
 
@@ -148,8 +148,10 @@ Item {
             spacing: app.fs
             anchors.right: parent.right
             BotonUX{
+                id: botClear
                 text: 'Limpiar'
                 height: app.fs*2
+                KeyNavigation.tab: botReg
                 onClicked: {
                     tiCodigo.text=''
                     tiDescripcion.text=''
@@ -159,6 +161,7 @@ Item {
                     tiCodigo.focus=true
                     labelStatus.text='Formulario limpiado.'
                 }
+                UnikFocus{}
             }
             BotonUX{
                 id: botReg
@@ -179,6 +182,7 @@ Item {
                         modify()
                     }
                 }
+                UnikFocus{}
             }
         }
     }

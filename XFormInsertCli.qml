@@ -193,8 +193,7 @@ Item {
             border.width:   2
             UnikFocus{
                 visible: lv.focus
-                //c:'red'
-                //border.color: 'blue'
+                radius: 0
             }
             ListView{
                 id: lv

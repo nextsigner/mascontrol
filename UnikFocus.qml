@@ -2,6 +2,7 @@ import QtQuick 2.0
 
 Rectangle {
     id: r
+    visible: r.parent.focus
     width: parent.width
     height: parent.height
     anchors.centerIn: parent

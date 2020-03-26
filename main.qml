@@ -79,28 +79,29 @@ ApplicationWindow {
                 id: xForms
                 width: parent.width
                 height: xApp.height-xMenu.height-app.fs*2.25
-                XInicio{visible: app.mod===-1}
+                XInicio{visible: app.mod===0}
                 XFormInsert{
                     id: xFormInsert
-                    visible: app.mod===0
+                    visible: app.mod===1
                     tableName: 'productos'
                     cols: app.colsProds
                 }
-                XFormInsertCli{
-                    id: xFormInsertCli
-                    visible: app.mod===3
-                    tableName: 'clientes'
-                    cols: app.colsClis
-                }
                 XFormSearch{
                     id: xFormSearch
-                    visible: app.mod===1
+                    visible: app.mod===2
                     currentTableName: xFormInsert.tableName
                 }
                 XFormFact{
                     id: xFormFact
-                    visible: app.mod===2
+                    visible: app.mod===3
                 }
+                XFormInsertCli{
+                    id: xFormInsertCli
+                    visible: app.mod===4
+                    tableName: 'clientes'
+                    cols: app.colsClis
+                }
+
             }
         }
         ULogView{id:uLogView}
@@ -131,10 +132,10 @@ ApplicationWindow {
     Shortcut{
         sequence: 'Ctrl+Tab'
         onActivated: {
-            if(app.mod<3){
+            if(app.mod<4){
                 app.mod++
             }else{
-                app.mod=-1
+                app.mod=0
             }
         }
     }
@@ -195,6 +196,24 @@ ApplicationWindow {
                                 tel TEXT NOT NULL,
                                 email TEXT NOT NULL,
                                 saldo DECIMAL(14,2) NOT NULL
+                            )'
+        unik.sqlQuery(sql)
+        sql='CREATE TABLE IF NOT EXISTS facts
+                            (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                ms NUMERIC NOT NULL,
+                                codcli TEXT NOT NULL,
+                                com TEXT NOT NULL
+                            )'
+        unik.sqlQuery(sql)
+        sql='CREATE TABLE IF NOT EXISTS prodfact
+                            (
+                                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                cod TEXT NOT NULL,
+                                des TEXT NOT NULL,
+                                desc NUMERIC NOT NULL,
+                                cant NUMERIC NOT NULL,
+                                pve DECIMAL(14,2) NOT NULL
                             )'
         unik.sqlQuery(sql)
         //console.log('Ejecutado: '+ejecutado)

@@ -35,10 +35,10 @@ Item {
                 onTextChanged: {
                     r.buscando=true
                     lv.currentIndex=0
-//                    if(text===''){
-//                        lm.clear()
-//                        return
-//                    }
+                    //                    if(text===''){
+                    //                        lm.clear()
+                    //                        return
+                    //                    }
                     search()
                 }
             }
@@ -105,135 +105,146 @@ Item {
         }
 
         UText{id: cant}
-        ListView{
-            id: lv
-            model: lm
-            delegate: delPorCod//rbCod.checked?delPorCod:delPorDes
-            spacing: app.fs*0.5
+        Rectangle{
             width: parent.width
             height: r.height-tiSearch.height-app.fs*2-cant.height
-            clip: true
-            onFocusChanged: currentIndex=1
-            KeyNavigation.tab: tiSearch
-            Keys.onDownPressed: {
-                if(currentIndex<lm.count-1){
-                    currentIndex++
-                }else{
-                    currentIndex=1
-                }
+            color: 'transparent'
+            border.color: app.c2
+            border.width:   2
+            UnikFocus{
+                visible: lv.focus
+                radius: 0
             }
-            Keys.onUpPressed: {
-                if(currentIndex>1){
-                    currentIndex--
-                }else{
-                    currentIndex=lm.count-1
-                }
-            }
-            ListModel{
-                id: lm
-                function addProd(pid, pcod, pdes, pcos, pven, pstock, pgan){
-                    return{
-                        vpid: pid,
-                        vpcod: pcod,
-                        vpdes: pdes,
-                        vpcos:pcos,
-                        vpven: pven,
-                        vpstock: pstock,
-                        vpgan: pgan
+            ListView{
+                id: lv
+                model: lm
+                delegate: delPorCod//rbCod.checked?delPorCod:delPorDes
+                spacing: app.fs*0.5
+                width: parent.width
+                height: parent.height
+                clip: true
+                onFocusChanged: currentIndex=1
+                KeyNavigation.tab: tiSearch
+                Keys.onDownPressed: {
+                    if(currentIndex<lm.count-1){
+                        currentIndex++
+                    }else{
+                        currentIndex=1
                     }
                 }
-            }
-            Component{
-                id: delPorCod
-                Rectangle{
-                    id:xRowDes
-                    width: parent.width
-                    height: parseInt(vpid)!==-10?txtDes.height+app.fs:app.fs*3
-                    radius: app.fs*0.1
-                    border.width: 2
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
-                    property string fontColor: index!==lv.currentIndex?app.c2:app.c1
-                    Row{
-                        visible: parseInt(vpid)!==-10
-                        anchors.centerIn: parent
-                        Rectangle{
-                            id: xRD1
-                            width: app.fs*10
-                            height:xRD2.height
-                            border.width: 2
-                            border.color: app.c2
-                            color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
-                            UText{
-                                text: vpcod
-                                anchors.centerIn: parent
-                                color: xRowDes.fontColor
-                            }
-                        }
-                        Rectangle{
-                            id: xRD2
-                            width: xRowDes.width-xRD1.width-xRD3.width
-                            height:txtDes.contentHeight+app.fs*2
-                            border.width: 2
-                            border.color: app.c2
-                            color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
-                            UText{
-                                id: txtDes
-                                text: vpdes
-                                color: xRowDes.fontColor
-                                width: parent.width-app.fs
-                                wrapMode: Text.WordWrap
-                                anchors.centerIn: parent
-                            }
-                        }
-                        Rectangle{
-                            id: xRD3
-                            width: app.fs*10
-                            height:xRD2.height
-                            border.width: 2
-                            border.color: app.c2
-                            color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
-                            UText{
-                                text: '$'+vpcos
-                                color: xRowDes.fontColor
-                                anchors.centerIn: parent
-                            }
+                Keys.onUpPressed: {
+                    if(currentIndex>1){
+                        currentIndex--
+                    }else{
+                        currentIndex=lm.count-1
+                    }
+                }
+                ListModel{
+                    id: lm
+                    function addProd(pid, pcod, pdes, pcos, pven, pstock, pgan){
+                        return{
+                            vpid: pid,
+                            vpcod: pcod,
+                            vpdes: pdes,
+                            vpcos:pcos,
+                            vpven: pven,
+                            vpstock: pstock,
+                            vpgan: pgan
                         }
                     }
+                }
+                Component{
+                    id: delPorCod
                     Rectangle{
-                        visible: parseInt(vpid)===-10
-                        width: xRowDes.width
-                        height:app.fs*3
+                        id:xRowDes
+                        width: parent.width
+                        height: parseInt(vpid)!==-10?txtDes.height+app.fs:app.fs*3
+                        radius: app.fs*0.1
                         border.width: 2
-                        border.color: app.c2
-                        color: app.c1
-                        UText{
-                            text: tiSearch.text==='*'?'Mostrando todos los productos.':'Resultados de '+tiSearch.text
-                            color: app.c2
-                            anchors.verticalCenter: parent.verticalCenter
-                            anchors.left: parent.left
-                            anchors.leftMargin: app.fs
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
+                        property string fontColor: index!==lv.currentIndex?app.c2:app.c1
+                        Row{
+                            visible: parseInt(vpid)!==-10
+                            anchors.centerIn: parent
+                            Rectangle{
+                                id: xRD1
+                                width: app.fs*10
+                                height:xRD2.height
+                                border.width: 2
+                                border.color: app.c2
+                                color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
+                                UText{
+                                    text: vpcod
+                                    anchors.centerIn: parent
+                                    color: xRowDes.fontColor
+                                }
+                            }
+                            Rectangle{
+                                id: xRD2
+                                width: xRowDes.width-xRD1.width-xRD3.width
+                                height:txtDes.contentHeight+app.fs*2
+                                border.width: 2
+                                border.color: app.c2
+                                color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
+                                UText{
+                                    id: txtDes
+                                    text: vpdes
+                                    color: xRowDes.fontColor
+                                    width: parent.width-app.fs
+                                    wrapMode: Text.WordWrap
+                                    anchors.centerIn: parent
+                                }
+                            }
+                            Rectangle{
+                                id: xRD3
+                                width: app.fs*10
+                                height:xRD2.height
+                                border.width: 2
+                                border.color: app.c2
+                                color: parseInt(vpid)!==-10&&index!==lv.currentIndex?app.c1:app.c2
+                                UText{
+                                    text: '$'+vpcos
+                                    color: xRowDes.fontColor
+                                    anchors.centerIn: parent
+                                }
+                            }
                         }
-                    }
-                    BotonUX{
-                        text: 'Eliminar'
-                        height: app.fs*2
-                        fontColor: app.c2
-                        bg.color: app.c1
-                        glow.radius: 2
-                        visible: index===lv.currentIndex&&parseInt(vpid)!==-10
-                        anchors.right: parent.right
-                        anchors.rightMargin: app.fs*0.5
-                        anchors.verticalCenter: parent.verticalCenter
-                        onClicked: {
-                            let sql='delete from '+r.currentTableName+' where id='+vpid
-                            unik.sqlQuery(sql)
-                            search()
+                        Rectangle{
+                            visible: parseInt(vpid)===-10
+                            width: xRowDes.width
+                            height:app.fs*3
+                            border.width: 2
+                            border.color: app.c2
+                            color: app.c1
+                            UText{
+                                text: tiSearch.text==='*'?'Mostrando todos los productos.':'Resultados de '+tiSearch.text
+                                color: app.c2
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.left: parent.left
+                                anchors.leftMargin: app.fs
+                            }
+                        }
+                        BotonUX{
+                            text: 'Eliminar'
+                            height: app.fs*2
+                            fontColor: app.c2
+                            bg.color: app.c1
+                            glow.radius: 2
+                            visible: index===lv.currentIndex&&parseInt(vpid)!==-10
+                            anchors.right: parent.right
+                            anchors.rightMargin: app.fs*0.5
+                            anchors.verticalCenter: parent.verticalCenter
+                            onClicked: {
+                                let sql='delete from '+r.currentTableName+' where id='+vpid
+                                unik.sqlQuery(sql)
+                                search()
+                            }
                         }
                     }
                 }
             }
-            }
+        }
     }
     Component.onCompleted: {
         if(r.visible)search()
