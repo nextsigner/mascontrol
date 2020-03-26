@@ -32,7 +32,7 @@ ApplicationWindow {
             if(bdFileName===''){
                 let d=new Date(Date.now())
                 let dia=d.getDate()
-                let mes=d.getMonth()
+                let mes=d.getMonth()+1
                 let anio=(''+d.getYear()).split('')
 
                 let hora=d.getHours()
@@ -221,7 +221,7 @@ ApplicationWindow {
     function getNewBdName(){
         let d=new Date(Date.now())
         let dia=d.getDate()
-        let mes=d.getMonth()
+        let mes=d.getMonth()+1
         let anio=(''+d.getYear()).split('')
 
         let hora=d.getHours()

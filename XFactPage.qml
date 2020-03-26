@@ -167,6 +167,25 @@ Rectangle{
                             }
                             onSeted:  {
                                 parent.editing=false
+                                let sql = 'select * from facts where id='+text
+                                let rows=unik.getSqlData(sql)
+                                //uLogView.showLog('Rows: '+rows.length+' text: '+text)
+                                if(rows.length>0){
+                                    let d = new Date(parseInt(rows[0].col[1]))
+                                    let dia=''+d.getDate()
+                                    let mes=''+parseInt(d.getMonth()+1)
+                                    let anio=(''+d.getYear()).split('')
+
+                                    if(dia.length===1){
+                                        dia='0'+dia
+                                    }
+                                    if(mes.length===1){
+                                        mes='0'+mes
+                                    }
+                                    let anioCorr=anio[anio.length-2]+anio[anio.length-1]
+                                    xCabFact.fecha=''+dia+'/'+mes+'/'+anioCorr
+                                }
+
                             }
                         }
 
@@ -178,6 +197,7 @@ Rectangle{
                         border.width: 1
                         radius: 6
                         UText{
+                            id: txtFecha
                             text: '<b>Fecha:</b> '+xCabFact.fecha;
                             font.pixelSize: r.fontSize*1.5
                             color: 'white'
@@ -191,11 +211,24 @@ Rectangle{
                     Item{
                         width: xCabFact.width*0.5-xCabFact.horSpacing*0.5
                         height: 30
-                        UText{
-                            text: '<b>Señor/es: </b>'+xCabFact.srs
-                            color: 'black'
-                            font.pixelSize: r.fontSize
-                            anchors.verticalCenter: parent.verticalCenter
+                        Row{
+                            spacing: app.fs
+                            UTextInput{
+                                id: tiCodCliente
+                                label: '<b>Código de Cliente: </b>'
+                                fontColor: 'black'
+                                fontSize: r.fontSize
+                                textInputContainer.border.color: 'transparent'
+                                width: app.fs*16
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
+                            UText{
+                                id: txtCliNombre
+                                text: '<b>Señor/s: </b>'+xCabFact.srs
+                                color: 'black'
+                                font.pixelSize: r.fontSize
+                                anchors.verticalCenter: parent.verticalCenter
+                            }
                         }
                         Rectangle{
                             width: parent.width
@@ -208,7 +241,8 @@ Rectangle{
                         width: xCabFact.width*0.5-xCabFact.horSpacing*0.5
                         height: 30
                         UText{
-                            text: '<b>IVA: </b>'
+                            id: txtCliEMail
+                            text: '<b>E-Mail: </b>'
                             color: 'black'
                             font.pixelSize: r.fontSize
                             anchors.verticalCenter: parent.verticalCenter
@@ -228,6 +262,7 @@ Rectangle{
                         width: xCabFact.width*0.5-xCabFact.horSpacing*0.5
                         height: 30
                         UText{
+                            id: txtCliDomicilio
                             text: '<b>Domicilio: </b>'+xCabFact.domicilio
                             color: 'black'
                             font.pixelSize: r.fontSize
@@ -244,6 +279,7 @@ Rectangle{
                         width: xCabFact.width*0.5-xCabFact.horSpacing*0.5
                         height: 30
                         UText{
+                            id: txtCliCuit
                             text: '<b>CUIT: </b>'+xCabFact.cuit
                             color: 'black'
                             font.pixelSize: r.fontSize
@@ -595,5 +631,9 @@ Rectangle{
     Component.onCompleted:{
         let cPdfPage=compPdfPage
         let oPdfPage=cPdfPage.createObject(colPdfPages, {})
+    }
+    function loadClientData(){
+        let sql = 'select * from clientes where cod=\''+tiCodCliente.text+'\''
+        let rows=unik.getSqlData(sql)
     }
 }
